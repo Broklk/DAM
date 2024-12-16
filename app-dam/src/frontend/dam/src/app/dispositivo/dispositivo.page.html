@@ -1,6 +1,6 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>dispositivo</ion-title>
+  <ion-toolbar color="primary">
+    <ion-title>Detalle de dispositivo</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -10,6 +10,17 @@
       <ion-title size="large">dispositivo</ion-title>
     </ion-toolbar>
   </ion-header>
-  <!-- <button (click)="subscribe()">Subscribe</button>
-  <button (click)="unsubscribe()">Unsubscribe</button> -->
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>{{ nombre }} - {{ ubicacion }}</ion-card-title>
+      <ion-card-subtitle>Última Medición: {{ ultimaMedicion }}%</ion-card-subtitle>
+    </ion-card-header>
+  
+    <ion-button (click)="onoff()">
+      {{ valvulaAbierta ? 'Cerrar Válvula' : 'Abrir Válvula' }}
+    </ion-button>
+    <ion-button [routerLink]="['/mediciones', dispositivoId]"
+    [queryParams]="{ nombre: nombre, ubicacion: ubicacion }">Ver Mediciones</ion-button>
+  </ion-card>
 </ion-content>

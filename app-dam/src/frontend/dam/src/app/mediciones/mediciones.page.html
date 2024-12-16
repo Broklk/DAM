@@ -1,0 +1,24 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>Historial de mediciones</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Historial de mediciones</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-list>
+    <ion-list-header>
+      <ion-label>{{ nombre }} - {{ ubicacion }}</ion-label>
+    </ion-list-header>
+    <ion-item *ngFor="let medicion of mediciones">
+      <ion-label>
+        <p>{{ medicion.fecha | formatFecha }}</p>
+        <h2>{{ medicion.valor }}%</h2>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

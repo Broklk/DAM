@@ -1,70 +1,56 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
-import { Observable, Subscription, fromEvent, interval } from 'rxjs';
+import { Component } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DispositivoService } from '../services/dispositivo.service';
-import { ActivatedRoute } from '@angular/router';
+import { IonicModule } from '@ionic/angular';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-dispositivo',
-  templateUrl: './dispositivo.page.html',
-  styleUrls: ['./dispositivo.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule]
+  imports: [IonicModule, CommonModule, RouterLink],
+  templateUrl: './dispositivo.page.html',
+  providers: [DispositivoService],
 })
-export class DispositivoPage implements OnInit, OnDestroy {
+export class DispositivoPage {
+  nombre: string = '';
+  ubicacion: string = '';
+  dispositivoId: string;
+  ultimaMedicion: number = 0;
+  valvulaAbierta: boolean = false; // Estado inicial de la válvula
 
-  observable$: Observable<any>
-  dispositivos: any = []
-  // subscription: Subscription
-
-  mouseMove$ = fromEvent(document, 'mousemove')
-
-  constructor(private _dispositivoService: DispositivoService,
-    private _actRouter: ActivatedRoute
-  ) {
-    this.observable$ = interval(1000)
-
-    // this.subscription = this.mouseMove$.subscribe((evt: any) => {
-    //   console.log(`Coords: ${evt.clientX} X ${evt.clientY} Y`)
-    // })
-    // this.subscription = this.observable$.subscribe((value) => {
-    //   console.log(value)
-    // })
+  constructor(private route: ActivatedRoute, private dispositivoService: DispositivoService) {
+    this.dispositivoId = this.route.snapshot.paramMap.get('id') || '';
   }
 
-  // subscribe () {
-  //   this.subscription = this.observable$.subscribe((value) => {
-  //     console.log(value)
-  //   })
-  // }
-
-  // unsubscribe () {
-  //   this.subscription.unsubscribe()
-  // } 
-
-  @Input()
-  id = '';
-
-  ionViewWillEnter () {
-    console.log(this._actRouter.snapshot.paramMap.get('id'))
+  ngOnInit() {
+    this.dispositivoService.obtenerDetalleDispositivo(this.dispositivoId).subscribe((data) => {
+      this.nombre = data.nombre;
+      this.ubicacion = data.ubicacion;
+    });
+    this.registrarNuevaMedicion();
   }
 
-  ngOnInit () {
-    console.log(this.id)
-    this._dispositivoService.getDispositivos()
-      .then((data) => {
-        this.dispositivos = data
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-    console.log(this.dispositivos)
+  registrarNuevaMedicion() {
+    this.ultimaMedicion = parseFloat((Math.random() * 100).toFixed(2)); // Genera humedad entre 0 y 100
+    this.dispositivoService
+      .registrarMedicion(this.dispositivoId, this.ultimaMedicion)
+      .subscribe(() => {
+        console.log(`Nueva medición registrada: ${this.ultimaMedicion}%`);
+      });
   }
 
-  ngOnDestroy () {
-    // this.subscription.unsubscribe()
+  onoff() {
+    // Invertimos el estado de la válvula
+    this.valvulaAbierta = !this.valvulaAbierta;
+
+    // Enviamos la acción al backend
+    this.dispositivoService
+      .registrarRiego(this.dispositivoId, this.valvulaAbierta, this.ultimaMedicion)
+      .subscribe(() => {
+        alert(`Válvula ${this.valvulaAbierta ? 'abierta' : 'cerrada'} correctamente`);
+      });
   }
+
 
 }
+

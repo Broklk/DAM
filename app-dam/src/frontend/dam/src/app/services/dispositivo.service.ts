@@ -1,16 +1,28 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
-import { Dispositivo } from '../interfaces/dispositivo';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DispositivoService {
+  private apiUrl = 'http://localhost:8000/dispositivo';
 
-  constructor(private _http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  getDispositivos () {
-    return firstValueFrom(this._http.get('http://localhost:8000/dispositivo'))
+  obtenerDispositivos(): Observable<any> {
+    return this.http.get(`${this.apiUrl}`);
+  }
+
+  obtenerDetalleDispositivo(id: string): Observable<any> {
+    return this.http.get<any>(`/dispositivos/${id}`);
+  }
+
+  registrarRiego(id: string, apertura: boolean, humedad: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${id}/registrar-riego`, { apertura, humedad });
+  }
+
+  registrarMedicion(id: string, humedad: number) : Observable<any> {
+    return this.http.post(`${this.apiUrl}/${id}/registrar-medicion`, { humedad });
   }
 }

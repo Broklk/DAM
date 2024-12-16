@@ -141,5 +141,11 @@
     "@angular-eslint/schematics:library": {
       "setParserOptionsProject": true
     }
+  },
+  "serve": {
+  "options": {
+    "proxyConfig": "proxy.conf.json"
   }
+}
+
 }
